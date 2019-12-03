@@ -1,0 +1,47 @@
+package queue
+
+import (
+	"encoding/json"
+	"github.com/nats-io/nats.go"
+	"kumparan/internal/config"
+	"kumparan/internal/contract"
+	"log"
+)
+
+const SubjectNews = "news_queue"
+
+var (
+	natsConnection *nats.Conn
+)
+
+func Publish(n contract.News) error {
+	payload, err := json.Marshal(n)
+	if err != nil {
+		return err
+	}
+
+	if err = GetNats().Publish(SubjectNews, payload); err != nil {
+		return err
+	}
+
+	log.Println("sent to broker")
+	return nil
+}
+
+func NATSConnect(c config.NATSConf) {
+	opts := []nats.Option{
+		nats.Name(c.Name),
+		nats.Token(c.Token),
+	}
+
+	nc, err := nats.Connect(c.URL, opts...)
+	if err != nil {
+		log.Panicf("ga bisa konek ke broker: %s", err)
+	}
+
+	natsConnection = nc
+}
+
+func GetNats() *nats.Conn {
+	return natsConnection
+}

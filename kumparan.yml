@@ -1,0 +1,25 @@
+broker:
+  host: "127.0.0.1"
+  port: 5672
+  username: "kumparan"
+  password: "kumparan"
+  vhost: "news_service"
+
+db:
+  DSN: "kumparan:kumparan@tcp(127.0.0.1)/kumparan?charset=utf8mb4&parseTime=True"
+  max_open_con: 8
+  max_idle_con: 4
+  lifetime_second: 60
+
+server:
+  bind: "127.0.0.1:3000"
+  read_timeout: 10
+  read_header_timeout: 10
+  write_timeout: 10
+  idle_timeout:  10
+  max_worker: 4
+
+elastic:
+  host: 127.0.0.1
+  port: 9200
+  index_name: news_index
