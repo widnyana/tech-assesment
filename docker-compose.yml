@@ -1,0 +1,51 @@
+version: "3.7"
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  db:
+    build:
+      context: ./dockers/db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kumparan
+      MYSQL_USER: kumparan
+      MYSQL_PASSWORD: kumparan
+    ports:
+      - "3306:3306"
+
+  broker:
+    container_name: broker
+    build:
+      context: dockers/broker
+      dockerfile: Dockerfile
+    hostname: broker-server
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - app-tier
+
+  es:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+    build:
+      context: dockers/es
+      dockerfile: Dockerfile
+    container_name: es
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - app-tier
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+volumes:
+  news-service:
+  es-data:
+    driver: local
