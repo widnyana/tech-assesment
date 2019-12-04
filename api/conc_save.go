@@ -60,7 +60,7 @@ func newWorker(wpool chan chan createNewsJob, workerNum int) newsWorker {
 	return newsWorker{
 		id:         workerNum,
 		WorkerPool: wpool,
-		JobChannel: make(chan createNewsJob),
+		JobChannel: make(chan createNewsJob, 1),
 		quit:       make(chan bool),
 	}
 }

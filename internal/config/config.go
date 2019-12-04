@@ -28,6 +28,15 @@ type (
 		IdleTimeout       int64  `mapstructure:"idle_timeout"`
 		MaxWorker         int    `mapstructure:"max_worker"`
 		MaxQueue          int    `mapstructure:"max_queue"`
+		PaginationLimit   int    `mapstructure:"pagination_limit"`
+		CacheTTL          int    `mapstructure:"cache_ttl"`  // in second
+	}
+
+	RedisConf struct {
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		DB       int    `mapstructure:"db"`
+		Password string `mapstructure:"password"`
 	}
 
 	BrokerConf struct {
@@ -39,9 +48,10 @@ type (
 	}
 
 	Config struct {
-		Elastic ElasticConf `mapstructure:"elastic"`
 		Broker  BrokerConf  `mapstructure:"broker"`
 		DB      DBConf      `mapstructure:"db"`
+		Elastic ElasticConf `mapstructure:"elastic"`
+		Redis   RedisConf   `mapstructure:"redis"`
 		Srv     ServerConf  `mapstructure:"server"`
 	}
 )
@@ -65,6 +75,15 @@ func (b BrokerConf) DSN() string {
 		b.Host,
 		b.Port,
 		b.Vhost)
+}
+
+func (r RedisConf) DSN() string {
+	var auth string
+	if r.Password != "" {
+		auth = fmt.Sprintf(":%s@", r.Password)
+	}
+
+	return fmt.Sprintf("redis://%s%s:%d/%d?", auth, r.Host, r.Port, r.DB)
 }
 
 func GetConfig() Config {

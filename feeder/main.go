@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/bxcodec/faker"
+	"kumparan/internal/config"
 	"log"
 	"net/http"
 )
@@ -14,11 +16,12 @@ type FakeData struct {
 }
 
 func main() {
+	cfg := config.GetConfig()
 	client := &http.Client{}
 
 	log.Println("wololo!")
 
-	for i := 1; i <= 1000; i++ {
+	for i := 1; i <= 100; i++ {
 		data := FakeData{}
 		err := faker.FakeData(&data)
 		if err != nil {
@@ -32,7 +35,11 @@ func main() {
 			continue
 		}
 
-		req, err := http.NewRequest("POST", "http://localhost:3000/news", bytes.NewBuffer(payload))
+		req, err := http.NewRequest(
+			"POST",
+			fmt.Sprintf("http://%s/news", cfg.Srv.Bind),
+			bytes.NewBuffer(payload),
+		)
 		if err != nil {
 			log.Printf("i: %d | error crafting request: %s\n", i, err.Error())
 			continue

@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-func handleCreation(w http.ResponseWriter, r *http.Request) {
+func handleNewsEndpoint(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
 		expectJSON(http.HandlerFunc(createContent)).ServeHTTP(w, r)
 	default:
-		paginateContent(w, r)
+		handleNewsGet(w, r)
 	}
 
 }
@@ -57,7 +57,3 @@ func createContent(w http.ResponseWriter, r *http.Request) {
 	}, http.StatusOK)
 }
 
-func paginateContent(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte("halo!"))
-}

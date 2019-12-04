@@ -15,10 +15,21 @@
 
 3. run queue consumer
     ```bash
-    make compine_consumer
+    make compile_consumer
    ./consumer_svc
     ```
    
+4. run feeder
+
+    in case you want to insert bulk data 
+    ```bash
+       go run feeder/main.go 
+    ```
+
+5. test the pagination:
+    ```bash
+    curl "localhost:3000/news?page=1" -s | python -m json.tool 
+    ```
 # dev env
 - macos High Sierra
 - golang 1.13.4

@@ -17,9 +17,18 @@ server:
   read_header_timeout: 10
   write_timeout: 10
   idle_timeout:  10
-  max_worker: 4
+  max_worker: 8
+  max_queue: 100
+  pagination_limit: 10
+  cache_ttl: 60
 
 elastic:
   host: 127.0.0.1
   port: 9200
   index_name: news_index
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  db: 0
+  password: "kumparan"

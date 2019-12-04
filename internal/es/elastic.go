@@ -1,7 +1,7 @@
 package es
 
 import (
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 	"kumparan/internal/config"
 	"log"
 	"os"

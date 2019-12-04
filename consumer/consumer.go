@@ -60,6 +60,9 @@ func RunConsumer() {
 				log.Fatalf("error during shutdown: %s", err)
 			}
 
+			_ = queue.GetBrokerCon().Close()
+			_ = db.GetDB().Close()
+			_ = es.GetElasticClient().CloseIndex(cfg.Elastic.IndexName)
 			os.Exit(0)
 		}
 	}()

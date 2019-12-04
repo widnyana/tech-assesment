@@ -6,6 +6,9 @@ PID_CONSUMER      = /tmp/consumer_svc.pid
 CONSUMER_GO_FILES = ./consumer/cmd/main.go
 CONSUMER_SERVICE      = ./consumer_svc
 
+dependency:
+	@go mod download
+
 serve_api: restart_api
 	@fswatch -o -e ".*" -i ".*/[^.]*\\.go$$" ./api ./internal | xargs -n1 -I{}  make restart_api || make kill_api
 
@@ -36,4 +39,7 @@ containers:
 	@docker-compose build
 	@docker-compose up
 
-.PHONY: serve_api restart_api kill_api
+integration-test: containers dependency
+	@go test -v ./...
+
+.PHONY: serve_api restart_api kill_api compile_api serve_consumer restart_consumer kill_consumer compile_consumer integration-test containers dependency
