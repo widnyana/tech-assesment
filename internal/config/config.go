@@ -98,8 +98,8 @@ func loadConfig() {
 	v := viper.New()
 
 	v.SetConfigName("kumparan")                // name of config file (without extension)
-	v.AddConfigPath("/etc/kumpar/")            // path to look for the config file in
-	v.AddConfigPath("$HOME/.config/damarseta") // call multiple times to add many search paths
+	v.AddConfigPath("/etc/kumparan/")            // path to look for the config file in
+	v.AddConfigPath("$HOME/.config/kumparan") // call multiple times to add many search paths
 	v.AddConfigPath(".")                       // optionally look for config in the working directory
 	err := v.ReadInConfig()
 	if err != nil { // Handle errors reading the config file

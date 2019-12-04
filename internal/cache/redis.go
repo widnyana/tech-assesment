@@ -2,53 +2,66 @@ package cache
 
 import (
 	"fmt"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis"
 	"kumparan/internal/cetak"
 	"kumparan/internal/config"
 	"time"
 )
 
 type RConn struct {
-	con redis.Conn
+	client *redis.Client
 }
 
 var (
-	rCon *redis.Pool
+	rCon *RConn
 )
 
-func (r RConn) Ping() {
-	s, err := redis.String(r.Do("PING"))
-	if err != nil {
-		cetak.Printf("error pinging redis: %s", err)
-		return
+func NewHandler(client *redis.Client) *RConn {
+	return &RConn{
+		client: client,
 	}
-
-	cetak.Printf("result of pinging redis: %s", s)
 }
 
-func (r RConn) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
-	return r.con.Do(commandName, args)
-}
-
-func (r RConn) Set(name string, value []byte, ttl int) (string, error) {
-	return redis.String(r.con.Do("SET", name, value, "EX", ttl))
+func (r RConn) Set(name string, value []byte, ttl int) error {
+	status := r.client.Set(name, value, time.Second*time.Duration(ttl))
+	return status.Err()
 }
 
 func (r RConn) Get(name string) ([]byte, error) {
-	return redis.Bytes(r.con.Do("GET", name))
-}
+	status := r.client.Get(name)
 
-func (r RConn) Del(name string) (bool, error) {
-	return redis.Bool(r.con.Do("DEL", name))
-}
-
-func newPool(addr string) *redis.Pool {
-	return &redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		// Dial or DialContext must be set. When both are set, DialContext takes precedence over Dial.
-		Dial: func() (redis.Conn, error) { return redis.DialURL(addr) },
+	if status.Err() != nil {
+		return nil, status.Err()
 	}
+
+	return status.Bytes()
+
+}
+
+//
+func (r RConn) Del(name string) (bool, error) {
+	status := r.client.Del(name)
+	if status.Err() != nil {
+		return false, status.Err()
+	}
+
+	return true, nil
+}
+
+func (r RConn) Ping() error {
+	status := r.client.Ping()
+
+	if status.Err() != nil {
+		cetak.Printf("error pinging redis: %s", status.Err())
+		return status.Err()
+	}
+
+	cetak.Printf("result of pinging redis: %s", status.Val())
+	return nil
+}
+
+func (r RConn) Close() error {
+	return r.client.Close()
 }
 
 func InitializeRedisCache(c config.RedisConf) error {
@@ -56,20 +69,21 @@ func InitializeRedisCache(c config.RedisConf) error {
 		return fmt.Errorf("recheck redis config pls")
 	}
 
-	pool := newPool(c.DSN())
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", c.Host, c.Port),
+		Password: c.Password,
+		DB:       c.DB,
+		PoolSize: 10,
+	})
+
+	pool := NewHandler(client)
 	rCon = pool
 
-	cetak.Printf("redis pool initialized!: %s", c.DSN())
+	_ = rCon.Ping()
+	cetak.Printf("redis pool initialized!")
 	return nil
 }
 
-func GetRedisConn() RConn {
-
-	c := rCon.Get()
-	return RConn{c}
-}
-
-
-func GetRedisPool() *redis.Pool {
+func GetRedisConn() *RConn {
 	return rCon
 }

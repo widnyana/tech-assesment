@@ -55,7 +55,7 @@ func RunAPI() {
 			_ = queue.GetBrokerCon().Close()
 			_ = db.GetDB().Close()
 			_ = es.GetElasticClient().CloseIndex(cfg.Elastic.IndexName)
-			_ = cache.GetRedisPool().Close()
+			_ = cache.GetRedisConn().Close()
 			os.Exit(0)
 		}
 	}()

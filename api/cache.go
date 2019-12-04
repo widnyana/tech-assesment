@@ -8,7 +8,7 @@ import (
 	"kumparan/internal/contract"
 )
 
-func fetchFromCache(con cache.RConn, key string) ([]contract.NewsData, error) {
+func fetchFromCache(con *cache.RConn, key string) ([]contract.NewsData, error) {
 	result, err := con.Get(key)
 	if err != nil {
 		err = fmt.Errorf("could not fetch result from cache %s : %s", key, err)
@@ -26,13 +26,13 @@ func fetchFromCache(con cache.RConn, key string) ([]contract.NewsData, error) {
 
 }
 
-func setToCache(con cache.RConn, key string, data []byte, ttl int) error {
-	con.Ping()
-	status, err := con.Set(key, data, ttl)
+func setToCache(con *cache.RConn, key string, data []byte, ttl int) error {
+	_ = con.Ping()
+	err := con.Set(key, data, ttl)
 	if err != nil {
 		return fmt.Errorf("error storing data to cache: %s", err)
 	}
 
-	cetak.Printf("storing data to cache. key: %s | status: %s", key, status)
+	cetak.Printf("data stored to cache. key: %s ", key)
 	return nil
 }
