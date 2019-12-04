@@ -39,10 +39,10 @@ containers:
 	@docker-compose build
 	@docker-compose up
 
-integration-test: #containers dependency
+poortest: containers dependency
 	@mkdir -p ~/.config/kumparan
 	@cp kumparan.yml ~/.config/kumparan/kumparan.yml
 	@go test -v ./...
 	@rm -fr ~/.config/kumparan
 
-.PHONY: serve_api restart_api kill_api compile_api serve_consumer restart_consumer kill_consumer compile_consumer integration-test containers dependency
+.PHONY: serve_api restart_api kill_api compile_api serve_consumer restart_consumer kill_consumer compile_consumer poortest containers dependency

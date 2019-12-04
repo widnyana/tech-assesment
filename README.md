@@ -1,7 +1,5 @@
 # Kumparan Skill Test
 
-
-# How to
 1. run the containers
     ```bash
     make containers
@@ -26,9 +24,16 @@
        go run feeder/main.go 
     ```
 
-5. test the pagination:
+5. hit the pagination:
     ```bash
     curl "localhost:3000/news?page=1" -s | python -m json.tool 
+    ```
+   
+6. test
+    
+    please terminate the container from #1 first
+    ```bash
+    make poortest 
     ```
 # dev env
 - macos High Sierra
@@ -36,3 +41,9 @@
 - docker desktop v2.1.0.5 (40693)
     - Docker Engine: 19.03.5
     - Docker Compose: 1.24.1
+    
+# demo
+
+https://x.widnyana.web.id/news
+
+i've got some issue since my node low on memory. I will try to make it available.
